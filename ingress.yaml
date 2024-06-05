@@ -11,15 +11,15 @@ spec:
   tls:
   - hosts:
     - "foolcontrol.org"
-    secretName: wordpress-tls
+    secretName: lkp-tls
   rules:
-  - host: "foolcontrol.org"
+  - host: "lukasz.kolodziej.pro"
     http:
       paths:
       - pathType: Prefix
         path: "/"
         backend:
           service:
-            name: wordpress
+            name: lkp
             port:
-              name: wp-svc
+              name: lkp-svc

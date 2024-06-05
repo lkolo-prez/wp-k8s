@@ -2,25 +2,25 @@
 apiVersion: v1
 kind: PersistentVolume
 metadata:
-  name: nfs
+  name: lkp-nfs
 spec:
-  storageClassName: "" 
+  storageClassName: "nfs-csi"
   capacity:
-    storage: 20Gi
+    storage: 5Gi
   accessModes:
-    - ReadWriteMany
+  - ReadWriteMany
   nfs:
-    server: redacted # ip addres of nfs server
-    path: "redacted" # path to directory
+    server: 10.73.1.10 # ip of nfs server
+    path: "/srv/nfs" # path to directory
 ---
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: nfs
+  name: lkp-nfs
 spec:
-  storageClassName: ""
+  storageClassName: "nfs-csi"
   accessModes:
-    - ReadWriteMany 
+  - ReadWriteMany
   resources:
     requests:
-      storage: 20Gi
+      storage: 5Gi

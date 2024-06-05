@@ -1,7 +1,7 @@
 apiVersion: v1
 kind: ConfigMap
 metadata:
-  name: wordpress-custom-options
+  name: lkp-custom-options
 data:
   .htaccess: |
     # BEGIN WordPress
@@ -32,34 +32,34 @@ data:
 apiVersion: v1
 kind: Service
 metadata:
-  name: wordpress
+  name: lkp
   labels:
-    app: wordpress
+    app: lkp
 spec:
   ports:
-    - port: 80
-      targetPort: 80
-      name: wp-svc
+  - port: 80
+    targetPort: 80
+    name: lkp-svc
   selector:
-    app: wordpress
+    app: lkp
     tier: frontend
   type: LoadBalancer
   # only specify on RPI setup
-  #loadBalancerIP: redacted
+#loadBalancerIP: redacted
 
 ---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: wordpress
+  name: lkp
   labels:
-    app: wordpress
+    app: lkp
     role: wp
 spec:
   replicas: 2
   selector:
     matchLabels:
-      app: wordpress
+      app: lkp
       tier: frontend
   strategy:
     type: RollingUpdate
@@ -69,12 +69,12 @@ spec:
   template:
     metadata:
       labels:
-        app: wordpress
+        app: lkp
         tier: frontend
     spec:
       containers:
       - image: wordpress:6.2.1-php8.1-apache
-        name: wordpress
+        name: lkp
         env:
         - name: WORDPRESS_DB_HOST
           valueFrom:
@@ -101,14 +101,14 @@ spec:
             name: wordpress-custom-options
         ports:
         - containerPort: 80
-          name: wp-svc
+          name: lkp-svc
         resources:
           limits:
-            cpu: 1500m
-            memory: "1000Mi"
+            cpu: 500m
+            memory: "800Mi"
           requests:
-            memory: "400Mi"
-            cpu: "250m"
+            memory: "200Mi"
+            cpu: "150m"
         readinessProbe:
           tcpSocket:
             port: 80
@@ -120,21 +120,21 @@ spec:
           initialDelaySeconds: 3
           periodSeconds: 5
         volumeMounts:
-        - name: wordpress-persistent-storage
+        - name: lkp-persistent-storage
           mountPath: /var/www/html
-        - name: wordpress-custom
+        - name: lkp-custom
           mountPath: /usr/local/etc/php/conf.d/uploads.ini
           subPath: uploads.ini
-        - name: wordpress-custom
+        - name: lkp-custom
           mountPath: /var/www/html/.htaccess
           subPath: .htaccess
       volumes:
-      - name: wordpress-persistent-storage
+      - name: lkp-persistent-storage
         persistentVolumeClaim:
-          claimName: nfs
-      - name: wordpress-custom
+          claimName: lkp-nfs
+      - name: lkp-custom
         configMap:
-          name: wordpress-custom-options
+          name: lkp-custom-options
           items:
           - key: ".htaccess"
             path: ".htaccess"
